@@ -23,7 +23,7 @@ Muse、Codex 与可选的 Hypit 方法都由每位使用者在自己的电脑上
 
 ```bash
 git clone https://github.com/littlecy1011/frameflow.git
-cd ai-video-workbench
+cd frameflow
 cp .env.example .env.local
 python3 app.py
 ```
