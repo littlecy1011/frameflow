@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "summary",
+    "verdict",
+    "confidence",
+    "verified_facts",
+    "unverified_items",
+    "viral_mechanics",
+    "adaptation_strategy",
+    "hypit_brief",
+    "hypit_treatment",
+    "script",
+    "prompt_pack",
+    "risks",
+    "next_step"
+  ],
+  "properties": {
+    "summary": {"type": "string"},
+    "verdict": {"type": "string", "enum": ["建议制作", "有条件制作", "暂缓制作", "不建议制作"]},
+    "confidence": {"type": "string", "enum": ["low", "medium", "high"]},
+    "verified_facts": {"type": "array", "items": {"type": "string"}},
+    "unverified_items": {"type": "array", "items": {"type": "string"}},
+    "viral_mechanics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hook", "emotion", "pacing", "visual", "alternative_explanation"],
+      "properties": {
+        "hook": {"type": "string"},
+        "emotion": {"type": "string"},
+        "pacing": {"type": "string"},
+        "visual": {"type": "string"},
+        "alternative_explanation": {"type": "string"}
+      }
+    },
+    "adaptation_strategy": {"type": "string"},
+    "hypit_brief": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["goal", "audience", "platform", "deliverable", "constraints", "user_reservations"],
+      "properties": {
+        "goal": {"type": "string"},
+        "audience": {"type": "string"},
+        "platform": {"type": "string"},
+        "deliverable": {"type": "string"},
+        "constraints": {"type": "array", "items": {"type": "string"}},
+        "user_reservations": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "hypit_treatment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["premise", "viewer_experience", "story_movement", "visual_world", "performance_direction", "audio_direction"],
+      "properties": {
+        "premise": {"type": "string"},
+        "viewer_experience": {"type": "string"},
+        "story_movement": {"type": "string"},
+        "visual_world": {"type": "string"},
+        "performance_direction": {"type": "string"},
+        "audio_direction": {"type": "string"}
+      }
+    },
+    "script": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["time", "visual", "voiceover", "onscreen_text", "acceptance"],
+        "properties": {
+          "time": {"type": "string"},
+          "visual": {"type": "string"},
+          "voiceover": {"type": "string"},
+          "onscreen_text": {"type": "string"},
+          "acceptance": {"type": "string"}
+        }
+      }
+    },
+    "prompt_pack": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["generation_relationship", "input_responsibilities", "expressive_intent", "camera_and_edit", "prompt", "negative_prompt", "continuity"],
+        "properties": {
+          "generation_relationship": {"type": "string", "enum": ["text-directed", "first-last-frame", "reference-directed"]},
+          "input_responsibilities": {"type": "array", "items": {"type": "string"}},
+          "expressive_intent": {"type": "string"},
+          "camera_and_edit": {"type": "string"},
+          "prompt": {"type": "string"},
+          "negative_prompt": {"type": "string"},
+          "continuity": {"type": "string"}
+        }
+      }
+    },
+    "risks": {"type": "array", "items": {"type": "string"}},
+    "next_step": {"type": "string"}
+  }
+}
+

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Muse、Codex 与 Obsidian 驱动的本地 AI 视频生产工作台" />
+    <title>FrameFlow · AI 视频工作台</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div>
+            <strong>FrameFlow</strong>
+            <small>AI 视频工作台</small>
+          </div>
+        </div>
+
+        <nav aria-label="主导航">
+          <button class="nav-item active" data-view="topics">
+            <span class="nav-icon">◫</span><span>选题池</span><em id="navPending">0</em>
+          </button>
+          <button class="nav-item" data-view="production">
+            <span class="nav-icon">⌁</span><span>制作队列</span><em id="navReady">0</em>
+          </button>
+          <button class="nav-item" data-view="review">
+            <span class="nav-icon">▶</span><span>审片中心</span><em>0</em>
+          </button>
+          <button class="nav-item" data-view="archive">
+            <span class="nav-icon">◇</span><span>发布复盘</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-section">
+          <span class="section-label">自动化链路</span>
+          <div class="pipeline-mini">
+            <div class="pipeline-step online"><i></i><span>Muse 选题</span><b>在线</b></div>
+            <div class="pipeline-line"></div>
+            <div class="pipeline-step online"><i></i><span>Codex 拆解</span><b>就绪</b></div>
+            <div class="pipeline-line"></div>
+            <div class="pipeline-step guided"><i></i><span>导演制作</span><b>方法已接入</b></div>
+          </div>
+        </div>
+
+        <div class="local-badge">
+          <span class="pulse"></span>
+          <div><strong>仅在本机运行</strong><small>127.0.0.1 · 数据写回 Obsidian</small></div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">CONTENT OPERATIONS</p>
+            <h1 id="viewTitle">选题池</h1>
+          </div>
+          <div class="top-actions">
+            <div class="sync-status" id="syncStatus"><span></span>正在同步</div>
+            <button class="icon-button" id="refreshButton" title="立即刷新" aria-label="立即刷新">↻</button>
+          </div>
+        </header>
+
+        <section class="stats-grid" aria-label="工作流统计">
+          <button class="stat-card coral" data-stage="pending"><span>待你判断</span><strong id="statPending">0</strong><small>来自 Muse 的新候选</small></button>
+          <button class="stat-card violet" data-stage="analyzing"><span>Codex 拆解中</span><strong id="statAnalyzing">0</strong><small>后台自动运行</small></button>
+          <button class="stat-card mint" data-stage="ready_for_generation"><span>待生成</span><strong id="statReady">0</strong><small>等待模型与费用确认</small></button>
+          <button class="stat-card amber" data-stage="review"><span>待审片</span><strong id="statReview">0</strong><small>生成版本等待选择</small></button>
+        </section>
+
+        <section class="toolbar">
+          <div class="filter-group" role="tablist" aria-label="候选筛选">
+            <button class="filter active" data-filter="all">全部</button>
+            <button class="filter" data-filter="pending">待判断</button>
+            <button class="filter" data-filter="approved">已入选</button>
+            <button class="filter" data-filter="later">稍后</button>
+            <button class="filter" data-filter="rejected">已淘汰</button>
+          </div>
+          <div class="toolbar-controls">
+            <label class="sort-box">
+              <span>排序</span>
+              <select id="sortSelect" aria-label="候选排序">
+                <option value="default">默认顺序</option>
+                <option value="likes">点赞最多</option>
+                <option value="comments">评论最多</option>
+                <option value="published">发布日期最新</option>
+              </select>
+            </label>
+            <label class="search-box">
+              <span>⌕</span>
+              <input id="searchInput" type="search" placeholder="搜索标题、作者或平台" />
+            </label>
+          </div>
+        </section>
+
+        <section id="candidateGrid" class="candidate-grid" aria-live="polite"></section>
+
+        <section id="emptyState" class="empty-state hidden">
+          <div class="empty-orbit"><span>＋</span></div>
+          <h2>还没有符合条件的候选</h2>
+          <p>Muse 写入投递箱后，工作台会在几秒内自动显示。</p>
+        </section>
+      </main>
+
+      <aside class="detail-panel" id="detailPanel" aria-hidden="true">
+        <div class="detail-head">
+          <div><p class="eyebrow" id="detailKicker">CANDIDATE DETAIL</p><h2 id="detailTitle">候选详情</h2></div>
+          <button class="icon-button" id="closeDetail" aria-label="关闭详情">×</button>
+        </div>
+        <div id="detailBody" class="detail-body"></div>
+      </aside>
+    </div>
+
+    <div class="toast-stack" id="toastStack" aria-live="assertive"></div>
+
+    <dialog id="confirmDialog" class="confirm-dialog">
+      <form method="dialog">
+        <span class="dialog-kicker">HUMAN CHECKPOINT</span>
+        <h2>入选后立即开始 Codex 拆解</h2>
+        <p>后台会按导演方法完成 Brief、Treatment、原创脚本、分镜和提示词包，并写回 Obsidian；可选接入 Hypit skill。此步骤不会调用视频模型，也不会产生生成费用。</p>
+        <div class="dialog-actions">
+          <button value="cancel" class="button ghost">取消</button>
+          <button value="confirm" class="button primary">确认入选并拆解</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>
+
